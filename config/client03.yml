@@ -1,0 +1,58 @@
+#cloud-config
+
+hostname: "client03"
+write_files:
+  - content: |
+      172.17.8.91 client01
+      172.17.8.92 client02
+      172.17.8.93 client03
+      172.17.8.101 server01
+      172.17.8.102 server02
+      172.17.8.103 server03
+    path: "/etc/hosts"
+    permissions: "0644"
+    owner: "root"
+coreos:
+  units:
+    - name: "consulclient.service"
+      command: "start"
+      content: |
+        [Unit]
+        Description=Consul Client
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        Restart=always
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker kill consulclient
+        ExecStartPre=-/usr/bin/docker rm consulclient
+        ExecStartPre=-/usr/bin/docker volume create consulclient
+        ExecStartPre=/usr/bin/docker pull consul
+        ExecStart=/usr/bin/docker run --name consulclient \
+                  --net=host \
+                  -v consulclient:/consul/data \
+                  consul agent -bind=0.0.0.0 -retry-join=server01 -advertise=172.17.8.93
+        ExecStop=/usr/bin/docker stop consulclient
+    - name: "nomadclient.service"
+      command: "start"
+      content: |
+        [Unit]
+        Description=Nomad Client
+        After=consulclient.service
+        Requires=consulclient.service
+
+        [Service]
+        Restart=always
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker kill nomadclient
+        ExecStartPre=-/usr/bin/docker rm nomadclient
+        ExecStartPre=-/usr/bin/docker volume create nomadclient
+        ExecStartPre=/usr/bin/docker pull djenriquez/nomad
+        ExecStart=/usr/bin/docker run --name nomadclient \
+                  --net=host \
+                  --privileged \
+                  -v nomadclient:/nomad/data \
+                  -v /vagrant:/vagrant \
+                  djenriquez/nomad agent -config=/vagrant/config/%H.hcl
+        ExecStop=/usr/bin/docker stop nomadclient
