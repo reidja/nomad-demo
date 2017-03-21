@@ -1,4 +1,7 @@
-data_dir = "/etc/nomad.d"
+data_dir = "/nomad"
+bind_addr = "0.0.0.0"
+leave_on_interrupt = true
+leave_on_terminate = true
 
 server {
 	enabled = true

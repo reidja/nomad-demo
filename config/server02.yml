@@ -32,7 +32,20 @@ coreos:
         ExecStart=/usr/bin/docker run --name consulserver \
                   --net=host \
                   -v consulserver:/consul/data \
-                  consul agent -server -bind=0.0.0.0 -retry-join=server01 -advertise=172.17.8.102
+                  consul agent \
+                    -server \
+                    -bind=0.0.0.0 \
+                    -client=0.0.0.0 \
+                    -data-dir=/consul/data \
+                    -bootstrap-expect=3 \
+                    -ui \
+                    -retry-join=server01 \
+                    -retry-join=server03 \
+                    -retry-interval=10s\
+                    -join=server01 \
+                    -join=server03 \
+                    -rejoin \
+                    -advertise=172.17.8.102
         ExecStop=/usr/bin/docker stop consulserver
     - name: "nomadserver.service"
       command: "start"

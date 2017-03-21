@@ -31,8 +31,19 @@ coreos:
         ExecStartPre=/usr/bin/docker pull consul
         ExecStart=/usr/bin/docker run --name consulclient \
                   --net=host \
-                  -v consulclient:/consul/data \
-                  consul agent -bind=0.0.0.0 -retry-join=server01 -advertise=172.17.8.91
+                  -v consulserver:/consul/data \
+                  consul agent \
+                    -bind=0.0.0.0 \
+                    -client=0.0.0.0 \
+                    -data-dir=/consul/data \
+                    -ui \
+                    -retry-join=server01 \
+                    -retry-join=server03 \
+                    -retry-interval=10s\
+                    -join=server01 \
+                    -join=server03 \
+                    -rejoin \
+                    -advertise=172.17.8.91
         ExecStop=/usr/bin/docker stop consulclient
     - name: "nomadclient.service"
       command: "start"
@@ -54,5 +65,6 @@ coreos:
                   --privileged \
                   -v nomadclient:/nomad/data \
                   -v /vagrant:/vagrant \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
                   djenriquez/nomad agent -config=/vagrant/config/%H.hcl
         ExecStop=/usr/bin/docker stop nomadclient
