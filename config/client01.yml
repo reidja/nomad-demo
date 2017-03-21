@@ -66,5 +66,6 @@ coreos:
                   -v nomadclient:/nomad/data \
                   -v /vagrant:/vagrant \
                   -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v /tmp:/tmp \
                   djenriquez/nomad agent -config=/vagrant/config/%H.hcl
         ExecStop=/usr/bin/docker stop nomadclient

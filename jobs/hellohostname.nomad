@@ -14,11 +14,12 @@ job "hellohostname" {
 			driver = "docker"
 			
 			config {
-				image = "oliverkra/hello-hostname"
+				image = "reidja/nomad-hellohostname"
+                network_mode = "host"
 			}
 
 			service {
-				port = "http"
+				port = "web"
 
 				check {
 					 type = "http"
@@ -33,7 +34,7 @@ job "hellohostname" {
 				memory = 128
 
 				network {
-					port "http" {}
+					port "web" {}
 				}
 			}
 		}
