@@ -1,0 +1,14 @@
+{
+    "server": true,
+    "datacenter": "yow_a",
+    "data_dir": "/consul/data",
+    "advertise_addr": "172.17.8.102",
+    "bootstrap_expect": 3,
+    "bind_addr": "172.17.8.102",
+    "client_addr": "0.0.0.0",
+    "retry_join": ["server01", "server03"],
+    "start_join": ["server01", "server03"],
+    "rejoin_after_leave": true,
+    "leave_on_terminate": true,
+    "ui": true
+}

@@ -42,6 +42,10 @@ Vagrant.configure("2") do |config|
     config.vm.define vm_name = "client%02d" % [i] do |config|
       config.vm.hostname = vm_name
 
+      config.vm.provider :virtualbox do |v|
+        v.memory = 1024
+      end
+
       config.vm.network :private_network, ip: "172.17.8.#{i+90}"
       config.vm.synced_folder ".", "/vagrant", id: "client%02d-vagrant" % i, nfs:true, mount_options: ['nolock,vers=3,udp']
 

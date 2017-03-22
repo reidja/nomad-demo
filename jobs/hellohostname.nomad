@@ -1,12 +1,11 @@
 job "hellohostname" {
 	type = "service"
-	datacenters = ["dc1"]
+	datacenters = ["yow_a"]
 
 	update {
 		stagger = "30s"
 		max_parallel = 1
 	}
-
 	group "web" {
 		count = 1
 
@@ -29,8 +28,10 @@ job "hellohostname" {
 				}
 			}
 
+
+
 			resources {
-				cpu = 500
+				cpu = 100
 				memory = 128
 
 				network {

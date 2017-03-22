@@ -12,6 +12,12 @@ write_files:
     path: "/etc/hosts"
     permissions: "0644"
     owner: "root"
+  - content: |
+      alias nomad='docker exec nomadclient nomad'
+      alias consul='docker exec consulclient consul'
+    path: "/etc/profile.d/aliases.sh"
+    permissions: "0644"
+    owner: "root"        
 coreos:
   units:
     - name: "consulclient.service"
@@ -31,19 +37,9 @@ coreos:
         ExecStartPre=/usr/bin/docker pull consul
         ExecStart=/usr/bin/docker run --name consulclient \
                   --net=host \
-                  -v consulserver:/consul/data \
-                  consul agent \
-                    -bind=0.0.0.0 \
-                    -client=0.0.0.0 \
-                    -data-dir=/consul/data \
-                    -ui \
-                    -retry-join=server01 \
-                    -retry-join=server03 \
-                    -retry-interval=10s\
-                    -join=server01 \
-                    -join=server03 \
-                    -rejoin \
-                    -advertise=172.17.8.92
+                  -v /vagrant:/vagrant \
+                  -v consulclient:/consul/data \
+                  consul agent -config-file=/vagrant/config/consul%H.json
         ExecStop=/usr/bin/docker stop consulclient
     - name: "nomadclient.service"
       command: "start"
@@ -67,5 +63,5 @@ coreos:
                   -v /vagrant:/vagrant \
                   -v /var/run/docker.sock:/var/run/docker.sock \
                   -v /tmp:/tmp \
-                  djenriquez/nomad agent -config=/vagrant/config/%H.hcl
+                  djenriquez/nomad agent -config=/vagrant/config/nomad%H.hcl
         ExecStop=/usr/bin/docker stop nomadclient
