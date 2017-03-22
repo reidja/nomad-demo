@@ -69,6 +69,8 @@ nomad stop hellohostname
 
 ## Running the hashi UI
 
+![stuff](http://i.imgur.com/uTAfVJR.png)
+
 You can run the hashi-ui (this is provided as a nomad job). This will provide a nice web gui interface into nomad and consul.
 
 ```
